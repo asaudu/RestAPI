@@ -3,11 +3,18 @@ package main
 import (
 	"net/http"
 
+	"addyCodes.com/RestAPI/db"
 	"addyCodes.com/RestAPI/models"
 	"github.com/gin-gonic/gin"
 )
 
+var dbInstance = db.Database{}
+
+var dbOperations = db.NewDatabase(dbInstance.DB)
+
 func main() {
+	dbOperations.InitDB()
+
 	server := gin.Default()
 
 	server.GET("/events", getEvents)
@@ -16,7 +23,11 @@ func main() {
 }
 
 func getEvents(context *gin.Context) {
-	events := models.GetAllEvents()
+	events, err := models.GetAllEvents(dbOperations.DB)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch events"})
+	}
+
 	context.JSON(http.StatusOK, events)
 }
 
@@ -31,6 +42,10 @@ func createEvent(context *gin.Context) {
 	event.ID = 1
 	event.UserID = 1
 
-	event.Save()
+	err = event.Save(dbOperations.DB)
+
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could create event"})
+	}
 	context.JSON(http.StatusCreated, gin.H{"message": "Event created!", "event": event})
 }
