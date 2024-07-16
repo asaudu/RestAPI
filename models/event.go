@@ -97,3 +97,18 @@ func (event Event) Update(db *sql.DB) error {
 
 	return err
 }
+
+func (event Event) Delete(db *sql.DB) error {
+	query := "DELETE FROM events WHERE id = ?"
+
+	statement, err := db.Prepare(query)
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	_, err = statement.Exec(event.ID)
+
+	return err
+}

@@ -21,5 +21,8 @@ func RegisterRoutes(server *gin.Engine, db *sql.DB) {
 		eventRoutes.PUT("/:id", func(c *gin.Context) {
 			updateEvent(c, db)
 		})
+		eventRoutes.DELETE("/:id", func(c *gin.Context) {
+			deleteEvent(c, db)
+		})
 	}
 }
