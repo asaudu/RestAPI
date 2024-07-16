@@ -35,7 +35,6 @@ func (e Event) Save(db *sql.DB) error {
 
 	id, err := result.LastInsertId()
 	e.ID = id
-	//events = append(events, e)
 
 	return err
 }
@@ -77,4 +76,24 @@ func GetEventById(db *sql.DB, id int64) (*Event, error) {
 	}
 
 	return &event, nil
+}
+
+func (event Event) Update(db *sql.DB) error {
+	query := `
+	UPDATE events
+	SET name = ?, description = ?, location = ?, dateTime =?
+	WHERE id = ?
+	`
+
+	statement, err := db.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	defer statement.Close()
+
+	_, err = statement.Exec(event.Name, event.Description, event.Location, event.DateTime, event.ID)
+
+	return err
 }

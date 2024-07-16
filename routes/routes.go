@@ -18,5 +18,8 @@ func RegisterRoutes(server *gin.Engine, db *sql.DB) {
 		eventRoutes.POST("/", func(c *gin.Context) {
 			createEvent(c, db)
 		})
+		eventRoutes.PUT("/:id", func(c *gin.Context) {
+			updateEvent(c, db)
+		})
 	}
 }
