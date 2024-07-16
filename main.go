@@ -1,11 +1,8 @@
 package main
 
 import (
-	"net/http"
-	"strconv"
-
 	"addyCodes.com/RestAPI/db"
-	"addyCodes.com/RestAPI/models"
+	"addyCodes.com/RestAPI/routes"
 	"github.com/gin-gonic/gin"
 )
 
@@ -15,55 +12,8 @@ var dbOperations = db.NewDatabase(dbInstance.DB)
 
 func main() {
 	dbOperations.InitDB()
-
 	server := gin.Default()
+	routes.RegisterRoutes(server, dbOperations.DB)
 
-	server.GET("/events", getEvents)
-	server.GET("/events/:eventId", getEvent)
-	server.POST("/events", createEvent)
 	server.Run(":8080")
-}
-
-func getEvent(context *gin.Context) {
-	eventId, err := strconv.ParseInt(context.Param("eventId"), 10, 64)
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse event ID."})
-		return
-	}
-
-	event, err := models.GetEventById(dbOperations.DB, eventId)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch event."})
-		return
-	}
-
-	context.JSON(http.StatusOK, event)
-}
-
-func getEvents(context *gin.Context) {
-	events, err := models.GetAllEvents(dbOperations.DB)
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could not fetch events"})
-	}
-
-	context.JSON(http.StatusOK, events)
-}
-
-func createEvent(context *gin.Context) {
-	var event models.Event
-	err := context.ShouldBindJSON(&event)
-
-	if err != nil {
-		context.JSON(http.StatusBadRequest, gin.H{"message": "Could not parse data"})
-		return
-	}
-	event.ID = 1
-	event.UserID = 1
-
-	err = event.Save(dbOperations.DB)
-
-	if err != nil {
-		context.JSON(http.StatusInternalServerError, gin.H{"message": "Could create event"})
-	}
-	context.JSON(http.StatusCreated, gin.H{"message": "Event created!", "event": event})
 }
