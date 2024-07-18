@@ -25,4 +25,10 @@ func RegisterRoutes(server *gin.Engine, db *sql.DB) {
 			deleteEvent(c, db)
 		})
 	}
+	signUpRoute := server.Group("/signup")
+	{
+		signUpRoute.POST("/", func(c *gin.Context) {
+			signup(c, db)
+		})
+	}
 }
