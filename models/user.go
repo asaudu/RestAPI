@@ -1,6 +1,10 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+
+	"addyCodes.com/RestAPI/api-test/utils"
+)
 
 type User struct {
 	ID       int64
@@ -18,7 +22,9 @@ func (u User) Save(db *sql.DB) error {
 
 	defer statement.Close()
 
-	result, err := statement.Exec(u.Email, u.Password)
+	hashedPassword, err := utils.HashPassword(u.Password)
+
+	result, err := statement.Exec(u.Email, hashedPassword)
 
 	if err != nil {
 		return err
