@@ -31,4 +31,10 @@ func RegisterRoutes(server *gin.Engine, db *sql.DB) {
 			signup(c, db)
 		})
 	}
+	loginRoute := server.Group("/login")
+	{
+		loginRoute.POST("/", func(c *gin.Context) {
+			login(c, db)
+		})
+	}
 }

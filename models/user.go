@@ -2,8 +2,9 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 
-	"addyCodes.com/RestAPI/api-test/utils"
+	"addyCodes.com/RestAPI/utils"
 )
 
 type User struct {
@@ -35,4 +36,24 @@ func (u User) Save(db *sql.DB) error {
 	u.ID = userId
 
 	return err
+}
+
+func (u User) ValidateCredentials(db *sql.DB) error {
+	query := "SELECT password FROM users WHERE email = ?"
+	row := db.QueryRow(query, u.Email)
+
+	var retrievedPassword string
+	err := row.Scan(&retrievedPassword)
+
+	if err != nil {
+		return errors.New("Credentials invalid")
+	}
+
+	passwordIsValid := utils.CheckPasswordHash(u.Password, retrievedPassword)
+
+	if !passwordIsValid {
+		return errors.New("Credentials invalid")
+	}
+
+	return nil
 }
