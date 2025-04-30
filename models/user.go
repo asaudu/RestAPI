@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"addyCodes.com/RestAPI/utils"
 )
@@ -39,17 +40,22 @@ func (u User) Save(db *sql.DB) error {
 }
 
 func (u User) ValidateCredentials(db *sql.DB) error {
-	query := "SELECT password FROM users WHERE email = ?"
+	query := "SELECT id, password FROM users WHERE email = ?"
 	row := db.QueryRow(query, u.Email)
+	fmt.Println("ValidateCredentials row check ", row)
 
 	var retrievedPassword string
-	err := row.Scan(&retrievedPassword)
+	//var theId int64
+	err := row.Scan(&u.ID, &retrievedPassword)
+	fmt.Println("ID Check", u.ID)
+	fmt.Println("ValidateCredentials error check ", err)
 
 	if err != nil {
 		return errors.New("Credentials invalid")
 	}
 
 	passwordIsValid := utils.CheckPasswordHash(u.Password, retrievedPassword)
+	fmt.Println("ValidateCredentials passwordIsValid check ", passwordIsValid)
 
 	if !passwordIsValid {
 		return errors.New("Credentials invalid")
