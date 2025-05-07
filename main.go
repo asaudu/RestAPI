@@ -21,5 +21,5 @@ func main() {
 	server.Run(":8080")
 
 	server.GET("/metrics", gin.WrapH(promhttp.Handler()))
-	http.ListenAndServe(":8088", nil)
+	http.ListenAndServe(":2112", nil)
 }
