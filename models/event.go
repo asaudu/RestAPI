@@ -3,6 +3,8 @@ package models
 import (
 	"database/sql"
 	"time"
+
+	"addyCodes.com/RestAPI/metrics"
 )
 
 type Event struct {
@@ -17,6 +19,11 @@ type Event struct {
 var events = []Event{}
 
 func (e Event) Save(db *sql.DB) error {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("SaveEvent").Observe(time.Since(start).Seconds())
+	}()
+
 	query := `
 	INSERT INTO events(name, description, location, dateTime, user_id)
 	VALUES (?, ?, ?, ?, ?)
@@ -40,6 +47,10 @@ func (e Event) Save(db *sql.DB) error {
 }
 
 func GetAllEvents(db *sql.DB) ([]Event, error) {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("GetAllEvents").Observe(time.Since(start).Seconds())
+	}()
 
 	query := "SELECT * FROM events"
 	rows, err := db.Query(query)
@@ -64,6 +75,11 @@ func GetAllEvents(db *sql.DB) ([]Event, error) {
 }
 
 func GetEventById(db *sql.DB, id int64) (*Event, error) {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("GetEventByID").Observe(time.Since(start).Seconds())
+	}()
+
 	query := "SELECT * FROM events WHERE id = ?"
 
 	row := db.QueryRow(query, id)
@@ -79,6 +95,11 @@ func GetEventById(db *sql.DB, id int64) (*Event, error) {
 }
 
 func (event Event) Update(db *sql.DB) error {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("UpdateEvent").Observe(time.Since(start).Seconds())
+	}()
+
 	query := `
 	UPDATE events
 	SET name = ?, description = ?, location = ?, dateTime =?
@@ -99,6 +120,11 @@ func (event Event) Update(db *sql.DB) error {
 }
 
 func (event Event) Delete(db *sql.DB) error {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("DeleteEvent").Observe(time.Since(start).Seconds())
+	}()
+
 	query := "DELETE FROM events WHERE id = ?"
 
 	statement, err := db.Prepare(query)

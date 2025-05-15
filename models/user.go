@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"time"
 
+	"addyCodes.com/RestAPI/metrics"
 	"addyCodes.com/RestAPI/utils"
 )
 
@@ -15,6 +17,11 @@ type User struct {
 }
 
 func (u User) Save(db *sql.DB) error {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("GetAllEvents").Observe(time.Since(start).Seconds())
+	}()
+
 	query := "INSERT INTO users(email, password) VALUES (?, ?)"
 	statement, err := db.Prepare(query)
 
@@ -40,6 +47,11 @@ func (u User) Save(db *sql.DB) error {
 }
 
 func (u User) ValidateCredentials(db *sql.DB) error {
+	start := time.Now()
+	defer func() {
+		metrics.DbQueryDuration.WithLabelValues("ValidateUserCredentials").Observe(time.Since(start).Seconds())
+	}()
+
 	query := "SELECT id, password FROM users WHERE email = ?"
 	row := db.QueryRow(query, u.Email)
 	fmt.Println("ValidateCredentials row check ", row)
