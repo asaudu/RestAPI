@@ -2,8 +2,8 @@ POST http://localhost:8080/events
 Content-Type: application/json
 
 {
-    "Name": "Round Two",
-    "Description": "All play arcade",
-    "Location": "An arcade location",
-    "DateTime": "2024-11-18T15:30:00.000Z"
+    "Name": "Prometheus Sixth",
+    "Description": "Sixth request to track",
+    "Location": "Thee 6th request location",
+    "DateTime": "2025-05-23T15:30:00.000Z"
 }

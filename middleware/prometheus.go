@@ -19,7 +19,7 @@ func PrometheusMiddleware() gin.HandlerFunc {
 		duration := time.Since(start).Seconds()
 		status := strconv.Itoa((ctx.Writer.Status()))
 
-		metrics.HttpRequestTotal.WithLabelValues(path, c.Request.Method, status).Inc()
+		metrics.HttpRequestTotal.WithLabelValues(path, ctx.Request.Method, status).Inc()
 		metrics.HttpRequestDuration.WithLabelValues(path).Observe(duration)
 	}
 }
